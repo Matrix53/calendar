@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell, ipcMain } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, Menu, Tray } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -38,14 +38,19 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0)
 }
 
+// Set the application menu
+Menu.setApplicationMenu(null)
+
 let win: BrowserWindow | null = null
 const preload = path.join(__dirname, '../preload/index.mjs')
 const indexHtml = path.join(RENDERER_DIST, 'index.html')
 
 async function createWindow() {
   win = new BrowserWindow({
-    title: 'Main window',
-    icon: path.join(process.env.VITE_PUBLIC, 'favicon.ico'),
+    title: '日历',
+    width: 1250,
+    height: 800,
+    icon: path.join(process.env.VITE_PUBLIC, 'icon.png'),
     webPreferences: {
       preload,
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
@@ -57,7 +62,30 @@ async function createWindow() {
     },
   })
 
-  if (VITE_DEV_SERVER_URL) { // #298
+  // enable cross origin
+  win.webContents.session.webRequest.onBeforeSendHeaders(
+    (details, callback) => {
+      delete details.requestHeaders['Origin']
+      callback({ requestHeaders: { ...details.requestHeaders, origin: '*' } })
+    }
+  )
+  win.webContents.session.webRequest.onHeadersReceived((details, callback) => {
+    if (details.responseHeaders) {
+      delete details.responseHeaders['Access-Control-Allow-Origin']
+      delete details.responseHeaders['Access-Control-Allow-Headers']
+    }
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'access-control-allow-origin': '*',
+        'access-control-allow-headers':
+          'Origin,Content-Length,Content-Type,x-token',
+      },
+    })
+  })
+
+  if (VITE_DEV_SERVER_URL) {
+    // #298
     win.loadURL(VITE_DEV_SERVER_URL)
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
@@ -76,9 +104,40 @@ async function createWindow() {
     return { action: 'deny' }
   })
   // win.webContents.on('will-navigate', (event, url) => { }) #344
+
+  win.on('close', (event) => {
+    event.preventDefault() // 阻止默认的关闭行为
+    win.hide() // 隐藏主窗口
+    return false
+  })
 }
 
-app.whenReady().then(createWindow)
+let tray = null
+app
+  .whenReady()
+  .then(createWindow)
+  .then(() => {
+    tray = new Tray(path.join(process.env.VITE_PUBLIC, 'icon.png'))
+    const contextMenu = Menu.buildFromTemplate([
+      {
+        label: '打开主面板',
+        click: () => {
+          win.show()
+        },
+      },
+      {
+        label: '退出',
+        click: () => {
+          app.exit()
+        },
+      },
+    ])
+    tray.setToolTip('日历')
+    tray.setContextMenu(contextMenu)
+    tray.on('double-click', () => {
+      win.show()
+    })
+  })
 
 app.on('window-all-closed', () => {
   win = null
