@@ -5,36 +5,55 @@
         <n-calendar
           v-model:value="value"
           #="{ year, month, date }"
-          :is-date-disabled="isDateDisabled"
           @update:value="handleUpdateValue"
         >
-          {{ year }}-{{ month }}-{{ date }}
+          <calendar-item :year="year" :month="month" :date="date" />
         </n-calendar>
       </div>
     </n-gi>
     <n-gi :span="7">
       <div class="todo-container">
         <n-grid :cols="20">
-          <n-gi :span="10">
-            <span class="todo-title">待办事项</span>
+          <n-gi :span="9">
+            <span class="todo-title">日程</span>
           </n-gi>
-          <n-gi :span="8">
+          <n-gi :span="7">
             <n-date-picker v-model:value="value" size="small" />
+          </n-gi>
+          <n-gi :span="4">
+            <n-button
+              size="small"
+              dashed
+              :style="{ marginLeft: '10px' }"
+              @click="handleAddTodo"
+              >添加</n-button
+            >
           </n-gi>
         </n-grid>
       </div>
     </n-gi>
   </n-grid>
+  <update-todo v-model:show="showAddTodo" />
 </template>
 
 <script lang="ts" setup>
 import { ref, inject } from 'vue'
-import { useMessage, NCalendar, NGrid, NGi, NDatePicker } from 'naive-ui'
-import { isYesterday, addDays } from 'date-fns/esm'
+import {
+  useMessage,
+  NCalendar,
+  NGrid,
+  NGi,
+  NDatePicker,
+  NButton,
+} from 'naive-ui'
+import { addDays } from 'date-fns/esm'
 import { IndexDBWrapper } from '../utils/indexdb'
+import CalendarItem from '../components/CalendarItem.vue'
+import UpdateTodo from '../components/UpdateTodo.vue'
 const message = useMessage()
 const db = inject<IndexDBWrapper>('db')!
 const value = ref(addDays(Date.now(), 1).valueOf())
+const showAddTodo = ref(false)
 
 function handleUpdateValue(
   _: number,
@@ -43,11 +62,8 @@ function handleUpdateValue(
   message.success(`${year}-${month}-${date}`)
 }
 
-function isDateDisabled(timestamp: number) {
-  if (isYesterday(timestamp)) {
-    return true
-  }
-  return false
+function handleAddTodo() {
+  showAddTodo.value = true
 }
 </script>
 
@@ -68,7 +84,7 @@ function isDateDisabled(timestamp: number) {
 }
 .todo-container {
   padding-top: 25px;
-  padding-left: 10px;
+  padding-left: 20px;
   border-left: 1px solid rgb(231, 232, 235);
   height: 100%;
   box-sizing: border-box;

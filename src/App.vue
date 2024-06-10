@@ -1,16 +1,18 @@
 <template>
   <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
     <n-message-provider>
-      <div class="app-container">
-        <n-layout has-sider position="absolute">
-          <n-layout-sider width="150px" bordered>
-            <n-menu :options="menuOptions" />
-          </n-layout-sider>
-          <n-layout-content>
-            <router-view />
-          </n-layout-content>
-        </n-layout>
-      </div>
+      <n-modal-provider>
+        <div class="app-container">
+          <n-layout has-sider position="absolute">
+            <n-layout-sider width="150px" bordered>
+              <n-menu :options="menuOptions" />
+            </n-layout-sider>
+            <n-layout-content>
+              <router-view />
+            </n-layout-content>
+          </n-layout>
+        </div>
+      </n-modal-provider>
     </n-message-provider>
   </n-config-provider>
 </template>
@@ -23,6 +25,7 @@ import {
   NMenu,
   NIcon,
   NMessageProvider,
+  NModalProvider,
   NConfigProvider,
   zhCN,
   dateZhCN,
@@ -50,7 +53,7 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(CalendarIcon),
   },
   {
-    label: renderLabel('待办', 'Todo'),
+    label: renderLabel('日程', 'Todo'),
     key: 'todo',
     icon: renderIcon(TodoIcon),
   },
