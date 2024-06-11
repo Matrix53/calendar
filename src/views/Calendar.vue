@@ -13,23 +13,24 @@
     </n-gi>
     <n-gi :span="7">
       <div class="todo-container">
-        <n-grid :cols="20">
-          <n-gi :span="9">
+        <n-grid :cols="24">
+          <n-gi :span="10">
             <span class="todo-title">日程</span>
           </n-gi>
-          <n-gi :span="7">
+          <n-gi :span="10">
             <n-date-picker v-model:value="value" size="small" />
           </n-gi>
           <n-gi :span="4">
             <n-button
               size="small"
-              dashed
+              type="primary"
               :style="{ marginLeft: '10px' }"
               @click="handleAddTodo"
               >添加</n-button
             >
           </n-gi>
         </n-grid>
+        <todo-list :time="value" />
       </div>
     </n-gi>
   </n-grid>
@@ -37,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, inject } from 'vue'
+import { ref } from 'vue'
 import {
   useMessage,
   NCalendar,
@@ -46,13 +47,12 @@ import {
   NDatePicker,
   NButton,
 } from 'naive-ui'
-import { addDays } from 'date-fns/esm'
-import { IndexDBWrapper } from '../utils/indexdb'
 import CalendarItem from '../components/CalendarItem.vue'
 import UpdateTodo from '../components/UpdateTodo.vue'
+import TodoList from '../components/TodoList.vue'
+
 const message = useMessage()
-const db = inject<IndexDBWrapper>('db')!
-const value = ref(addDays(Date.now(), 1).valueOf())
+const value = ref(Date.now().valueOf())
 const showAddTodo = ref(false)
 
 function handleUpdateValue(
@@ -85,6 +85,7 @@ function handleAddTodo() {
 .todo-container {
   padding-top: 25px;
   padding-left: 20px;
+  padding-right: 20px;
   border-left: 1px solid rgb(231, 232, 235);
   height: 100%;
   box-sizing: border-box;
