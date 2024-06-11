@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import './api/ipc'
 import { db } from './utils/db'
+import Icon from './assets/icon.ico'
 
 // add timer for web notification
 async function addTodoTimer() {
@@ -21,7 +22,7 @@ async function addTodoTimer() {
       new Notification('您有一个日程需要处理', {
         body: todo.name,
         requireInteraction: true,
-        icon: '/icon.ico',
+        icon: Icon,
       })
       if (localStorage.getItem(`${todo.id}`)) {
         localStorage.removeItem(`${todo.id}`)
@@ -61,7 +62,7 @@ db.todos.hook('creating', function (primKey, obj, transaction) {
       new Notification('您有一个日程需要处理', {
         body: obj.name,
         requireInteraction: true,
-        icon: '/icon.ico',
+        icon: Icon,
       })
       if (localStorage.getItem(`${primKey}`)) {
         localStorage.removeItem(`${primKey}`)
@@ -92,7 +93,7 @@ db.todos.hook('updating', function (modifications, primKey, obj, transaction) {
       new Notification('您有一个日程需要处理', {
         body: updatedObj.name,
         requireInteraction: true,
-        icon: '/icon.ico',
+        icon: Icon,
       })
       if (localStorage.getItem(`${primKey}`)) {
         localStorage.removeItem(`${primKey}`)

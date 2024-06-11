@@ -40,7 +40,11 @@ import {
 } from '@vicons/ionicons5'
 import { RouterLink, RouterView } from 'vue-router'
 
-const themeRef = ref(JSON.parse(localStorage.getItem('setting') || '{}').dark)
+const themeRef = ref(
+  JSON.parse(localStorage.getItem('setting') || '{}').dark
+    ? darkTheme
+    : undefined
+)
 
 function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
