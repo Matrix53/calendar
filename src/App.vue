@@ -1,5 +1,5 @@
 <template>
-  <n-config-provider :locale="zhCN" :date-locale="dateZhCN">
+  <n-config-provider :locale="zhCN" :date-locale="dateZhCN" :theme="themeRef">
     <n-message-provider>
       <n-modal-provider>
         <div class="app-container">
@@ -29,8 +29,9 @@ import {
   NConfigProvider,
   zhCN,
   dateZhCN,
+  darkTheme,
 } from 'naive-ui'
-import { h, Component } from 'vue'
+import { h, Component, ref, provide } from 'vue'
 import type { MenuOption } from 'naive-ui'
 import {
   CalendarNumberOutline as CalendarIcon,
@@ -38,6 +39,8 @@ import {
   SettingsOutline as SettingIcon,
 } from '@vicons/ionicons5'
 import { RouterLink, RouterView } from 'vue-router'
+
+const themeRef = ref(JSON.parse(localStorage.getItem('setting') || '{}').dark)
 
 function renderIcon(icon: Component) {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -63,6 +66,13 @@ const menuOptions: MenuOption[] = [
     icon: renderIcon(SettingIcon),
   },
 ]
+
+provide('whiteTheme', () => {
+  themeRef.value = undefined
+})
+provide('darkTheme', () => {
+  themeRef.value = darkTheme
+})
 </script>
 
 <style scoped></style>

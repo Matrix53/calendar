@@ -96,7 +96,10 @@ function handleConfirm(e: MouseEvent) {
       let date = new Date(formValue.value.time!)
       let dateID = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
       if (formValue.value.id) {
-        await db.todos.update(formValue.value.id, formValue.value)
+        await db.todos.update(formValue.value.id, {
+          ...formValue.value,
+          date: dateID,
+        })
       } else {
         await db.todos.add({
           ...formValue.value,
