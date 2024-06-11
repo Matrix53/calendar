@@ -49,27 +49,27 @@ import {
   useMessage,
   FormRules,
 } from 'naive-ui'
-import { ref, onBeforeMount } from 'vue'
+import { ref } from 'vue'
 import type { Ref } from 'vue'
 import { db } from '../utils/db'
 
 const show = defineModel('show', { type: Boolean, default: false })
-const props = defineProps<{
-  time?: number
-  todoID?: number
-}>()
 const message = useMessage()
 
 const formValue: Ref<{
   name: string
   description: string
-  time: number | undefined
-  remindTime: number | undefined
+  time?: number
+  remindTime?: number
+  id?: number
+  date?: string
 }> = ref({
   name: '',
   description: '',
   time: undefined,
   remindTime: undefined,
+  id: undefined,
+  date: undefined,
 })
 const rules: FormRules = {
   name: [{ required: true, message: '请输入日程名称', trigger: 'blur' }],
@@ -95,8 +95,8 @@ function handleConfirm(e: MouseEvent) {
     if (!errors) {
       let date = new Date(formValue.value.time!)
       let dateID = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
-      if (props.todoID) {
-        await db.todos.update(props.todoID, formValue.value)
+      if (formValue.value.id) {
+        await db.todos.update(formValue.value.id, formValue.value)
       } else {
         await db.todos.add({
           ...formValue.value,
@@ -110,6 +110,8 @@ function handleConfirm(e: MouseEvent) {
         description: '',
         time: undefined,
         remindTime: undefined,
+        id: undefined,
+        date: undefined,
       }
       message.success('已更新日程')
     } else {
@@ -118,23 +120,23 @@ function handleConfirm(e: MouseEvent) {
   })
 }
 
-onBeforeMount(async () => {
-  if (props.time) {
-    formValue.value.time = props.time
+async function showDialog(time?: number, todoID?: number) {
+  if (time) {
+    formValue.value.time = time
   }
-  if (props.todoID) {
-    let todo = await db.todos.get(props.todoID)
+  if (todoID) {
+    let todo = await db.todos.get(todoID)
     if (!todo) {
       message.error('未找到该日程')
       return
     }
-    formValue.value = {
-      name: todo.name,
-      description: todo.description,
-      time: todo.time,
-      remindTime: todo.remindTime,
-    }
+    formValue.value = todo
   }
+  show.value = true
+}
+
+defineExpose({
+  showDialog,
 })
 </script>
 

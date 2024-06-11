@@ -3,7 +3,7 @@
     <n-gi :span="13">
       <div class="calendar-container">
         <n-calendar
-          v-model:value="value"
+          v-model:value="time"
           #="{ year, month, date }"
           @update:value="handleUpdateValue"
         >
@@ -18,7 +18,7 @@
             <span class="todo-title">日程</span>
           </n-gi>
           <n-gi :span="10">
-            <n-date-picker v-model:value="value" size="small" />
+            <n-date-picker v-model:value="time" size="small" />
           </n-gi>
           <n-gi :span="4">
             <n-button
@@ -30,11 +30,11 @@
             >
           </n-gi>
         </n-grid>
-        <todo-list :time="value" />
+        <todo-list :time="time" />
       </div>
     </n-gi>
   </n-grid>
-  <update-todo v-model:show="showAddTodo" />
+  <update-todo ref="updateTodoRef" />
 </template>
 
 <script lang="ts" setup>
@@ -52,18 +52,18 @@ import UpdateTodo from '../components/UpdateTodo.vue'
 import TodoList from '../components/TodoList.vue'
 
 const message = useMessage()
-const value = ref(Date.now().valueOf())
-const showAddTodo = ref(false)
+const time = ref(Date.now().valueOf())
+const updateTodoRef = ref<InstanceType<typeof UpdateTodo> | null>(null)
 
 function handleUpdateValue(
   _: number,
   { year, month, date }: { year: number; month: number; date: number }
 ) {
-  message.success(`${year}-${month}-${date}`)
+  // message.success(`${year}-${month}-${date}`)
 }
 
 function handleAddTodo() {
-  showAddTodo.value = true
+  updateTodoRef.value?.showDialog(time.value)
 }
 </script>
 
@@ -84,7 +84,7 @@ function handleAddTodo() {
 }
 .todo-container {
   padding-top: 25px;
-  padding-left: 20px;
+  padding-left: 15px;
   padding-right: 20px;
   border-left: 1px solid rgb(231, 232, 235);
   height: 100%;
