@@ -30,7 +30,7 @@
     "axios": "^1.7.2",
     "chinese-days": "^1.2.4",
     "dexie": "^4.0.7",
-    "electron": "^29.1.1",
+    "electron": "^31.0.0",
     "electron-builder": "^24.13.3",
     "naive-ui": "^2.38.2",
     "typescript": "^5.4.2",
